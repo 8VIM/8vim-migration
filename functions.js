@@ -87,7 +87,7 @@ export function processAction(elements, yaml) {
       delete data.type;
       delete data.flags;
 
-      if (data.lower_case.toUpperCase() === data.upper_case) {
+      if (data.lower_case && data.lower_case.toUpperCase() === data.upper_case) {
         delete data.upper_case;
       }
       const movementSequence = Array.from(data.movement_sequence);
