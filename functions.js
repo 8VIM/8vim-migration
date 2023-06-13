@@ -66,7 +66,10 @@ export function processAction(elements, yaml) {
   if (find) {
     const flags = find.elements
       .filter(({ name }) => name === "flag")
-      .reduce((flags, { elements: [{ text }] }) => flags | text, 0);
+      .reduce(
+        (flags, { elements: [{ text }] }) => flags | parseInt(text, 10),
+        0
+      );
     if (flags) {
       data.flags = flags;
     }
@@ -80,14 +83,14 @@ export function processAction(elements, yaml) {
       yaml.layers.hidden.push(data);
       break;
     case "input_text":
-      if (isUpperCaseInput(data, yaml)) {
+      if (!data.lower_case || isUpperCaseInput(data, yaml)) {
         return;
       }
 
       delete data.type;
       delete data.flags;
 
-      if (data.lower_case && data.lower_case.toUpperCase() === data.upper_case) {
+      if (data.lower_case.toUpperCase() === data.upper_case) {
         delete data.upper_case;
       }
       const movementSequence = Array.from(data.movement_sequence);

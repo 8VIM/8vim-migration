@@ -51,7 +51,7 @@ try {
   console.log(chalk.yellow(`Migrating ${argv.xml} to ${output}`));
   const yaml = { layers: {} };
   const xml = await fs.readFile(argv.xml, "utf8");
-  const result = xml2js(xml, { ignoreComment: true, nativeType: true });
+  const result = xml2js(xml, { ignoreComment: true });
   if (
     !result.elements.length ||
     result.elements[0].type !== "element" ||
