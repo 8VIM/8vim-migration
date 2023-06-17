@@ -17,6 +17,11 @@ const argv = yargs(hideBin(process.argv))
         describe: "Force overwrite of the generated file",
         boolean: true,
       })
+      .option("redundancy", {
+        alias: "r",
+        describe: "Bypass default layer checks and place all maps in the hidden layer, no matter what",
+        boolean: true,
+      })
       .positional("xml", {
         describe: "Path of the XML to convert",
         normalize: true,
@@ -67,7 +72,7 @@ try {
   actionMap.elements
     .filter(({ name, type }) => name === "keyboardAction" && type === "element")
     .forEach(({ elements }) => {
-      if (elements) processAction(elements, yaml);
+      if (elements) processAction(elements, yaml, argv.redundancy);
     });
   cleanYaml(yaml);
   await fs.writeFile(output, YAML.stringify(yaml));

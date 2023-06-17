@@ -32,7 +32,7 @@ export function cleanYaml(yaml) {
   }
 }
 
-export function processAction(elements, yaml) {
+export function processAction(elements, yaml, excessive) {
   const data = {};
   Object.entries(properties).forEach(([prop, entry]) => {
     const find = elements.find(({ name }) => name === prop);
@@ -83,7 +83,7 @@ export function processAction(elements, yaml) {
       yaml.layers.hidden.push(data);
       break;
     case "input_text":
-      if (!data.lower_case || isUpperCaseInput(data, yaml)) {
+      if (!data.lower_case || (!excessive && isUpperCaseInput(data, yaml))) {
         return;
       }
 
@@ -96,10 +96,9 @@ export function processAction(elements, yaml) {
       const movementSequence = Array.from(data.movement_sequence);
       const isFullRotation = detectFullRotation(movementSequence);
       const quadrant = detectQuadrant(movementSequence);
-      if (isFullRotation && quadrant) {
+      if (!excessive && isFullRotation && quadrant) {
         return;
-      } else if (quadrant) {
-        delete data.movement_sequence;
+      } else if (!isFullRotation && quadrant) {
         if (!yaml.layers.default) {
           yaml.layers.default = { sectors: {} };
         }
@@ -115,8 +114,16 @@ export function processAction(elements, yaml) {
             null,
           ];
         }
-        yaml.layers.default.sectors[sector].parts[part][position] = data;
-      } else {
+        const pospart = {};
+        if(data['lower_case']) {
+          pospart['lower_case'] = data['lower_case'];
+        }
+        if(data['upper_case']) {
+          pospart['upper_case'] = data['upper_case'];
+        }
+        yaml.layers.default.sectors[sector].parts[part][position] = pospart;
+      }
+      if(excessive || (!isFullRotation && !quadrant)) {
         if (!yaml.layers.hidden) {
           yaml.layers.hidden = [];
         }
